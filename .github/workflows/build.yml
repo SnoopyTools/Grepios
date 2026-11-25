@@ -4,11 +4,14 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install XcodeGen
         run: brew install xcodegen
@@ -35,3 +38,15 @@ jobs:
         with:
           name: grepios-ipa
           path: grepios.ipa
+
+      - name: Publish release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: grepios build ${{ github.run_number }}
+          body: |
+            Automatic build from ${{ github.sha }}
+            ${{ github.event.head_commit.message }}
+          files: grepios.ipa
+          make_latest: true
