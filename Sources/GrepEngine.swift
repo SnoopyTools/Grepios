@@ -165,7 +165,7 @@ enum GrepEngine {
 
     /// Walks the roots synchronously. Uses nextObject() rather than for-in so it is safe to call from a Task.
     static func searchSync(regex: NSRegularExpression, roots: [URL], options o: GrepOptions, lineLimit: Int,
-                           isCancelled: () -> Bool, emit: (GrepEvent) -> Void) {
+                           isCancelled: @escaping () -> Bool, emit: @escaping (GrepEvent) -> Void) {
         let include = globs(o.includeGlob)
         let exclude = globs(o.excludeGlob)
         let maxBytes = o.maxFileSizeMB * 1_048_576
@@ -216,8 +216,8 @@ enum GrepEngine {
         AsyncThrowingStream { cont in
             let task = Task.detached(priority: .userInitiated) {
                 do {
-                    let regex = try makeRegex(pattern, options)
-                    searchSync(regex: regex, roots: roots, options: options, lineLimit: lineLimit,
+                    let regex = try GrepEngine.makeRegex(pattern, options)
+                    GrepEngine.searchSync(regex: regex, roots: roots, options: options, lineLimit: lineLimit,
                                isCancelled: { Task.isCancelled }, emit: { cont.yield($0) })
                     cont.finish()
                 } catch {

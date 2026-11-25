@@ -68,7 +68,7 @@ struct FileViewer: View {
         guard !loaded else { return }
         let root = target.file.root
         let url = target.file.url
-        let result: Result<[String], Error> = await Task.detached {
+        let result: Result<[String], Error> = await Task.detached { () -> Result<[String], Error> in
             let ok = root.startAccessingSecurityScopedResource()
             defer { if ok { root.stopAccessingSecurityScopedResource() } }
             do {

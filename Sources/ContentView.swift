@@ -20,7 +20,7 @@ struct ContentView: View {
             }
             .navigationTitle("grepios")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { toolbar }
+            .toolbar { toolbarContent }
             .sheet(isPresented: $showSettings, onDismiss: { model.rerunIfNeeded() }) {
                 SettingsView(model: model)
             }
@@ -163,7 +163,7 @@ struct ContentView: View {
     }
 
     @ToolbarContentBuilder
-    private var toolbar: some ToolbarContent {
+    private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
             if !model.results.isEmpty {
                 ShareLink(item: model.exportText) { Image(systemName: "square.and.arrow.up") }
@@ -229,8 +229,8 @@ func highlight(_ text: String, _ spans: [Span]) -> AttributedString {
     var a = AttributedString(text)
     for s in spans {
         if let r = Range(NSRange(location: s.location, length: s.length), in: a) {
-            a[r].backgroundColor = Color.yellow.opacity(0.45)
-            a[r].foregroundColor = Color.primary
+            a[r][AttributeScopes.SwiftUIAttributes.BackgroundColorAttribute.self] = Color.yellow.opacity(0.45)
+            a[r][AttributeScopes.SwiftUIAttributes.ForegroundColorAttribute.self] = Color.primary
             a[r].inlinePresentationIntent = .stronglyEmphasized
         }
     }
